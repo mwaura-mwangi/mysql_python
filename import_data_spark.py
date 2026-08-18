@@ -54,6 +54,7 @@ def main():
     print("Initializing spark session...")
     # Initialize spark with the maven package for mysql jdbc
     builder = SparkSession.builder
+
     spark = (
          builder
         .appName("CoffeeSalesETL_PySpark_Parkroad")

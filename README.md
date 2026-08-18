@@ -33,7 +33,7 @@ This project automates the process of combining segmented coffee shop transactio
 ├── coffee_sales_2.csv       # Source dataset (part 2)
 ├── import_data.py           # Core ETL script (Extract, Transform, Load)
 ├── main.py                  # test db connection
-├── .env.example             # Template for local database credentials
+├── .env                     # Template for local database credentials
 ├── .gitignore               # Ignores virtual environments & secret .env file
 └── README.md                # Project documentation
 ```
@@ -94,4 +94,77 @@ CREATE TABLE IF NOT EXISTS coffee_sales (
 
     coffee_name VARCHAR(100) NOT NULL
 );
+```
+
+---
+---
+---
+
+
+
+# Coffee Sales ETL: PySpark & MySQL Pipeline (Parkroad Branch)
+
+A lightweight ETL pipeline built with PySpark and MySQL to ingest, normalize, and merge multi-batch coffee shop sales records.
+
+This project handles common real world data issues such as schema mismatches between CSV exports and loads clean, typed records into MySQL via JDBC.
+
+---
+
+## What This Pipeline Does
+
+1. **Auto Prepares Infrastructure:** Connects via `mysql-connector-python` to verify and build the target database (`coffee_shop_parkroad`) and strict SQL schema prior to Spark operations.
+2. **Handles Schema Drift:** Automatically detects missing columns across batches (e.g., absent `card` column in batch 2) and backfills them with `NULL` before merging.
+3. **Normalizes & Type-Casts:** Unifies disparate CSV fields, renames keys to align with SQL conventions, and enforces strict SQL types (`DATE`, `DATETIME`, `DECIMAL(10,2)`).
+4. **Parallel JDBC Bulk Load:** Leverages PySpark's distributed `DataFrameWriter` to stream records into MySQL using the MySQL Connector/J driver.
+
+---
+## Tech Stack & Tooling
+**Language**: Python 3.12+
+
+**Package Management**: uv
+
+**Core Processing Engine**: Apache Spark / PySpark 3.5+
+
+**Database**: MySQL Server
+
+**Drivers & Libraries**: mysql-connector-j (JDBC), mysql-connector-python, python-dotenv
+
+
+## Environment & Dependencies
+uv venv
+
+source .venv/bin/activate
+
+uv pip install pyspark mysql-connector-python python-dotenv
+
+---
+## Project Structure
+
+```text
+├── coffee_sales_1.csv       # Source dataset (part 1)
+├── coffee_sales_2.csv       # Source dataset (part 2)
+├── import_data_spark.py     # Core pyspark ETL script (Extract, Transform, Load)
+├── main.py                  # test db connection
+├── .env                     # Template for local database credentials
+├── .gitignore               # Ignores virtual environments & secret .env file
+└── README.md                # Project documentation
+```
+
+## SQL Verification & Analysis
+Once loaded, inspect the transformed records directly in MySQL:
+
+```
+USE coffee_shop_parkroad;
+
+# Verify total row count
+SELECT COUNT(*) FROM coffee_sales_parkroad;
+
+# Revenue breakdown by coffee product
+SELECT 
+    coffee_name, 
+    COUNT(*) AS total_orders, 
+    SUM(money) AS total_revenue
+FROM coffee_sales_parkroad
+GROUP BY coffee_name
+ORDER BY total_revenue DESC;
 ```
