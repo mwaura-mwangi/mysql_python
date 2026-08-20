@@ -11,5 +11,22 @@ WHERE money <= 30.00
 LIMIT 10;
 
 
-SELECT *
+SELECT sale_date, cash_type, money
 FROM coffee_sales_parkroad_two
+
+SELECT SUM(money)
+FROM coffee_sales_parkroad_two
+
+SELECT MIN(money)
+FROM coffee_sales_parkroad_two
+
+SELECT MAX(money)
+FROM coffee_sales_parkroad_two
+
+SELECT AVG(money)
+FROM coffee_sales_parkroad_two
+
+SELECT cash_type,
+    COUNT(*) AS total_occurences
+FROM coffee_sales_parkroad_two
+GROUP BY cash_type;
